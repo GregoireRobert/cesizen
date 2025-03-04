@@ -14,7 +14,7 @@ export function useExternalEmotions() {
   const [error, setError] = useState<string | null>(null)
 
   // URL de l'API externe qui fournit les émotions
-  const API_URL = "http://localhost/api/external-emotions"
+  const API_URL = "https://backend/api/emotions"
 
   useEffect(() => {
     fetchEmotions()
