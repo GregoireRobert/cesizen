@@ -69,7 +69,7 @@ export default function EmotionJournal() {
 
     const newEntry: Omit<Tracker, "id"> = {
       emotionId: Number.parseInt(selectedEmotion.id),
-      emotionLabel: selectedEmotion.name,
+      emotionLabel: selectedEmotion.label,
       emotionColor: selectedEmotion.color,
       date: entryDate.toISOString(),
       note: note.trim() || undefined,
@@ -197,7 +197,7 @@ export default function EmotionJournal() {
                       <SelectItem key={emotion.id} value={emotion.id}>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: emotion.color }}></div>
-                          {emotion.name}
+                          {emotion.label}
                         </div>
                       </SelectItem>
                     ))

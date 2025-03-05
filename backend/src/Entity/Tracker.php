@@ -1,14 +1,28 @@
 <?php
 
 namespace App\Entity;
-
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TrackerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+
 
 #[ORM\Entity(repositoryClass: TrackerRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['tracker:read']], 
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ]
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'creator' => 'exact',
+    ])]
 class Tracker
 {
     #[ORM\Id]
@@ -17,6 +31,7 @@ class Tracker
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['tracker:read'])]
     private ?\DateTimeInterface $creationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -24,13 +39,16 @@ class Tracker
 
     #[ORM\ManyToOne(inversedBy: 'trackers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['tracker:read'])]
     private ?User $creator = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['tracker:read'])]
     private ?Emotion $emotion = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['tracker:read'])]
     private ?string $note = null;
 
     public function getId(): ?int

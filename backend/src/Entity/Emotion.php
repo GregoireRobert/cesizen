@@ -6,11 +6,20 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EmotionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EmotionRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['emotion:read']],
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ]
+)]
 class Emotion
 {
     #[ORM\Id]
@@ -19,25 +28,31 @@ class Emotion
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['emotion:read', 'tracker:read'])]
     private ?string $label = null;
 
     #[ORM\Column(length: 16, nullable: true)]
+    #[Groups(['emotion:read', 'tracker:read'])]
     private ?string $color = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'shades')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['emotion:read'])]
     private ?self $base = null;
 
     /**
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'base')]
+    #[Groups(['emotion:read'])]
     private Collection $shades;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['emotion:read'])]
     private ?\DateTimeInterface $creationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['emotion:read'])]
     private ?\DateTimeInterface $modifDate = null;
 
     public function __construct()

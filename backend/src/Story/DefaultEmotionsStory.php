@@ -9,12 +9,12 @@ final class DefaultEmotionsStory extends Story
     public function build(): void
     {
         $emotions = [
-            ['label' => 'Joie', 'color' => '#FFFF00', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Jaune
-            ['label' => 'Peur', 'color' => '#808080', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Gris
-            ['label' => 'Colère', 'color' => '#FF0000', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Rouge
-            ['label' => 'Tristesse', 'color' => '#0000FF', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Bleu
-            ['label' => 'Surprise', 'color' => '#FFFFCC', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Jaune clair
-            ['label' => 'Dégoût', 'color' => '#964B00', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Brun
+            ['label' => 'Joie', 'color' => '#58ef11', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Jaune
+            ['label' => 'Peur', 'color' => '#ba60ff', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Gris
+            ['label' => 'Colère', 'color' => '#ff3131', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Rouge
+            ['label' => 'Tristesse', 'color' => '#76afe2', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Bleu
+            ['label' => 'Surprise', 'color' => '#fff036', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Jaune clair
+            ['label' => 'Dégoût', 'color' => '#ad5d00', 'creationDate' => new \DateTime(), 'modifDate' => new \DateTime()], // Brun
         ];
         foreach ($emotions as $emotion) {
             EmotionFactory::createOne($emotion);
