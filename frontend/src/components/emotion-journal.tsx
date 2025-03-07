@@ -68,10 +68,10 @@ export default function EmotionJournal() {
     if (!selectedEmotion) return
 
     const newEntry: Omit<Tracker, "id"> = {
-      emotionId: Number.parseInt(selectedEmotion.id),
-      emotionLabel: selectedEmotion.label,
-      emotionColor: selectedEmotion.color,
-      date: entryDate.toISOString(),
+      // emotionId: Number.parseInt(selectedEmotion.id),
+      emotion: selectedEmotion,
+      // emotionColor: selectedEmotion.color,
+      creationDate: entryDate.toISOString(),
       note: note.trim() || undefined,
     }
 
@@ -141,15 +141,15 @@ export default function EmotionJournal() {
             </div>
           ) : (
             entries
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .sort((a, b) => new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime())
               .map((entry) => (
                 <Card key={entry.id} className="overflow-hidden">
-                  <div className="h-2" style={{ backgroundColor: entry.emotionColor }}></div>
+                  <div className="h-2" style={{ backgroundColor: entry.emotion.color }}></div>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: entry.emotionColor }}></div>
-                        <CardTitle className="text-lg">{entry.emotionLabel}</CardTitle>
+                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: entry.emotion.color }}></div>
+                        <CardTitle className="text-lg">{entry.emotion.label}</CardTitle>
                       </div>
                       <Button variant="ghost" size="icon" onClick={() => handleDeleteEntry(entry)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -166,7 +166,7 @@ export default function EmotionJournal() {
                   <CardFooter className="pt-0 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      <span>{formatEntryDate(entry.date)}</span>
+                      <span>{formatEntryDate(entry.creationDate)}</span>
                     </div>
                   </CardFooter>
                 </Card>

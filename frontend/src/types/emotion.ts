@@ -6,10 +6,13 @@ export interface Emotion {
 
 export interface Tracker {
   id?: number
-  emotionId: number
-  emotionLabel: string
-  emotionColor: string
-  date: string // Format ISO
+  emotion: {
+    label: string,
+    color: string
+  }
+  // emotionLabel: string
+  // emotionColor: string
+  creationDate: string // Format ISO
   note?: string
 }
 

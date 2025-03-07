@@ -8,7 +8,7 @@ export function useJournalEntries() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const API_URL = "http://localhost/api/journal-entries"
+  const API_URL = "https://localhost/api/trackers?creator="
 
   useEffect(() => {
     fetchEntries()
@@ -19,45 +19,51 @@ export function useJournalEntries() {
     setError(null)
 
     try {
-      const response = await fetch(API_URL)
+      const response = await fetch(API_URL + "6", {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+        // mode: "no-cors"
+      })
 
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`)
       }
 
       const data = await response.json()
-      setEntries(data["hydra:member"] || [])
+      setEntries(data || [])
     } catch (err) {
       console.error("Erreur lors de la récupération des entrées du journal:", err)
       setError("Impossible de charger les entrées du journal. Veuillez réessayer plus tard.")
 
-      // Données de démonstration en cas d'erreur
-      setEntries([
-        {
-          id: 1,
-          emotionId: 1,
-          emotionLabel: "Joie",
-          emotionColor: "#FFC107",
-          date: new Date(Date.now() - 86400000).toISOString(), // Hier
-          note: "Journée parfaite au parc avec des amis.",
-        },
-        {
-          id: 2,
-          emotionId: 3,
-          emotionLabel: "Colère",
-          emotionColor: "#F44336",
-          date: new Date(Date.now() - 172800000).toISOString(), // Avant-hier
-          note: "Frustré par les embouteillages ce matin.",
-        },
-        {
-          id: 3,
-          emotionId: 7,
-          emotionLabel: "Amour",
-          emotionColor: "#E91E63",
-          date: new Date().toISOString(), // Aujourd'hui
-          note: "Dîner romantique avec mon partenaire.",
-        },
-      ])
+      // // Données de démonstration en cas d'erreur
+      // setEntries([
+      //   {
+      //     id: 1,
+      //     emotionId: 1,
+      //     emotionLabel: "Joie",
+      //     emotionColor: "#FFC107",
+      //     date: new Date(Date.now() - 86400000).toISOString(), // Hier
+      //     note: "Journée parfaite au parc avec des amis.",
+      //   },
+      //   {
+      //     id: 2,
+      //     emotionId: 3,
+      //     emotionLabel: "Colère",
+      //     emotionColor: "#F44336",
+      //     date: new Date(Date.now() - 172800000).toISOString(), // Avant-hier
+      //     note: "Frustré par les embouteillages ce matin.",
+      //   },
+      //   {
+      //     id: 3,
+      //     emotionId: 7,
+      //     emotionLabel: "Amour",
+      //     emotionColor: "#E91E63",
+      //     date: new Date().toISOString(), // Aujourd'hui
+      //     note: "Dîner romantique avec mon partenaire.",
+      //   },
+      // ])
     } finally {
       setIsLoading(false)
     }
