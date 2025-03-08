@@ -8,7 +8,7 @@ export function useJournalEntries() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const API_URL = "https://localhost/api/trackers?creator="
+  const API_URL = "https://localhost/api/trackers"
 
   useEffect(() => {
     fetchEntries()
@@ -19,7 +19,7 @@ export function useJournalEntries() {
     setError(null)
 
     try {
-      const response = await fetch(API_URL + "6", {
+      const response = await fetch(API_URL + "?creator=6", {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',

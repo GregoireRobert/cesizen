@@ -7,12 +7,13 @@ export interface Emotion {
 export interface Tracker {
   id?: number
   emotion: {
-    label: string,
+    label: string
     color: string
   }
   // emotionLabel: string
   // emotionColor: string
   creationDate: string // Format ISO
   note?: string
+  symbol: React.ReactNode
 }
 

@@ -33,13 +33,11 @@ final class UserFactory extends PersistentProxyObjectFactory
     {
         return [
             'active' => True,
-            'creationDate' => self::faker()->dateTime(),
-            'email' => self::faker()->email(),
+            'email' => "admin@test.com",
             'firstName' => self::faker()->firstName(),
             'lastName' => self::faker()->lastName(),
-            'modifDate' => self::faker()->dateTime(),
-            'password' => self::faker()->text(),
-            'roles' => [],
+            'plainPassword' => "admin123",
+            'roles' => ["ROLE_ADMIN"],
         ];
     }
 
