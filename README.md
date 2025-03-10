@@ -40,6 +40,11 @@ docker exec -it backend sh
 ```
 bin/console doctrine:migrations:migrate
 ```
+Ajoutez l'utilisateur administrateur en chargeant les fixtures Doctrine (configurable dans backend/src/Story/UserStory.php):
+```
+bin/console doctrine:fixtures:load
+```
+
 Accédez aux différentes parties du projet via les URLs suivantes :
 
 Frontend React : http://localhost:3000
