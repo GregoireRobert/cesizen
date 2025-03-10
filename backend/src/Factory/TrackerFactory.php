@@ -33,6 +33,7 @@ final class TrackerFactory extends PersistentProxyObjectFactory
     {   
         $date = self::faker()->dateTimeBetween('-1 year', 'now');
         return [
+            'date' => $date,
             'creationDate' => $date,
             'creator' => UserFactory::new(),
             'emotion' => EmotionFactory::new(),

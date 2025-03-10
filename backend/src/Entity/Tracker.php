@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Entity;
+
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TrackerRepository;
@@ -11,45 +14,54 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
-
 #[ORM\Entity(repositoryClass: TrackerRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['tracker:read']], 
+    denormalizationContext: ['groups' => ['tracker:write']],
+    order: ['date' => 'DESC'],
     operations: [
         new Get(),
         new GetCollection(),
+        new Post(),
+        new Delete()
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'creator' => 'exact',
-    ])]
+])]
 class Tracker
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['tracker:read'])]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?\DateTimeInterface $creationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?\DateTimeInterface $modifDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'trackers')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['tracker:read'])]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?User $creator = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['tracker:read'])]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?Emotion $emotion = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['tracker:read'])]
+    #[Groups(['tracker:read', 'tracker:write'])]
     private ?string $note = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['tracker:read', 'tracker:write'])]
+    private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
     {
@@ -112,6 +124,18 @@ class Tracker
     public function setNote(?string $note): static
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }

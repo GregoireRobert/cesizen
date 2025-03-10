@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Operation;
+use App\Controller\MeController;
 
 #[ApiResource(
     operations: [
@@ -32,6 +34,33 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
+        // Ajout de l'opération personnalisée pour /me
+        new Get(
+            name: 'me',
+        
+            uriTemplate: '/me',
+            controller: MeController::class,
+            read: false,
+            normalizationContext: ['groups' => ['user:read']]
+            // openapiContext: [
+            //     'summary' => 'Get the current authenticated user',
+            //     'responses' => [
+            //         '200' => [
+            //             'description' => 'The current user',
+            //             'content' => [
+            //                 'application/json' => [
+            //                     'schema' => [
+            //                         '$ref' => '#/components/schemas/User-read',
+            //                     ],
+            //                 ],
+            //             ],
+            //         ],
+            //         '401' => [
+            //             'description' => 'Unauthorized',
+            //         ],
+            //     ],
+            // ]
+        ),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
@@ -39,7 +68,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[Groups(['user:read'])]

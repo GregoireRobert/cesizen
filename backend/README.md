@@ -52,3 +52,8 @@ Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helia
 
 
 docker exec -it backend sh
+
+## Tests unitaires
+```
+php bin/phpunit --filter UserRepositoryTest
+```

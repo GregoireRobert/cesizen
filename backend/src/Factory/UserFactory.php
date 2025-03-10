@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
@@ -10,13 +11,11 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
  */
 final class UserFactory extends PersistentProxyObjectFactory
 {
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
-     */
-    public function __construct()
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
+        $this->passwordHasher = $passwordHasher;
     }
 
     public static function class(): string
@@ -24,30 +23,27 @@ final class UserFactory extends PersistentProxyObjectFactory
         return User::class;
     }
 
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
-     * @todo add your default values here
-     */
     protected function defaults(): array|callable
     {
         return [
-            'active' => True,
-            'email' => "admin@test.com",
+            'active' => true,
+            'email' => self::faker()->unique()->safeEmail(),
             'firstName' => self::faker()->firstName(),
             'lastName' => self::faker()->lastName(),
-            'plainPassword' => "admin123",
-            'roles' => ["ROLE_ADMIN"],
+            'plainPassword' => 'admin123', // Mot de passe brut
+            'roles' => ['ROLE_ADMIN'],
         ];
     }
 
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
-     */
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(User $user): void {})
-        ;
+        return $this->afterInstantiate(function (User $user): void {
+            // Hacher le mot de passe avant de persister
+            if ($user->getPlainPassword()) {
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPlainPassword());
+                $user->setPassword($hashedPassword);
+                $user->eraseCredentials(); // Effacer le plainPassword pour des raisons de sécurité
+            }
+        });
     }
 }

@@ -17,13 +17,18 @@ final class UserStory extends Story
         $emotions = EmotionFactory::all();
 
         // Créez un utilisateur
-        $user = UserFactory::createOne();
+        $user = UserFactory::createOne([
+            'email' => "admin@cesizen.fr",
+            'plainPassword' => 'admin123', //
+            // Ajoutez d'autres champs nécessaires pour votre Tracker
+        ]);
         
         // Créez plusieurs trackers pour cet utilisateur
         for ($i = 0; $i < 5; $i++) {
             TrackerFactory::createOne([
                 'creator' => $user,
                 'emotion' => $emotions[array_rand($emotions)], // Choisissez une émotion aléatoire
+                'note' => 'Une note',
                 // Ajoutez d'autres champs nécessaires pour votre Tracker
             ]);
         }
