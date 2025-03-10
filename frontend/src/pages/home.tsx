@@ -13,6 +13,9 @@ export default function HomePage() {
           <div className="container flex h-20 items-center">
               <img src="/logo.png" alt="CESIZen Logo" className="h-20 w-20" />
               <div className="font-semibold text-lg">CESIZen</div>
+              <Link to="/info/about" className="flex items-center gap-2 text-lg px-3">
+                    Informations
+                  </Link>
           </div>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
