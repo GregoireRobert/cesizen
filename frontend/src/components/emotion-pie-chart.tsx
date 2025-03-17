@@ -1,4 +1,50 @@
-import { useEffect, useRef } from 'react'
+"use client"
+
+import { TrendingUp } from "lucide-react"
+import { Pie, PieChart } from "recharts"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+
+
+const chartConfig = {
+  visitors: {
+    label: "Visitors",
+  },
+  chrome: {
+    label: "Chrome",
+    color: "hsl(var(--chart-1))",
+  },
+  safari: {
+    label: "Safari",
+    color: "hsl(var(--chart-2))",
+  },
+  firefox: {
+    label: "Firefox",
+    color: "hsl(var(--chart-3))",
+  },
+  edge: {
+    label: "Edge",
+    color: "hsl(var(--chart-4))",
+  },
+  other: {
+    label: "Other",
+    color: "hsl(var(--chart-5))",
+  },
+} satisfies ChartConfig
+
 interface Emotion {
   id: number
   creationDate: string
@@ -13,110 +59,60 @@ interface EmotionPieChartProps {
   emotions: Emotion[]
 }
 
-export function EmotionPieChart({ period, emotions }: EmotionPieChartProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    // Process emotions data
-    const emotionCounts: { [key: string]: number } = {}
-    emotions.forEach(emotion => {
-      const label = emotion.emotion.label
-      emotionCounts[label] = (emotionCounts[label] || 0) + 1
-    })
-
-    const data = {
-      labels: Object.keys(emotionCounts),
-      values: Object.values(emotionCounts),
-      colors: emotions.map(emotion => emotion.emotion.color)
-    }
-    // Calculate total
-    const total = data.values.reduce((sum, value) => sum + value, 0)
-    
-    // Draw pie chart
-    const centerX = canvas.width / 2
-    const centerY = canvas.height / 2 - 20
-    const radius = Math.min(centerX, centerY) - 50
-    
-    let startAngle = 0
-    
-    data.values.forEach((value, index) => {
-      const sliceAngle = (2 * Math.PI * value) / total
-      
-      // Draw slice
-      ctx.beginPath()
-      ctx.moveTo(centerX, centerY)
-      ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle)
-      ctx.closePath()
-      ctx.fillStyle = data.colors[index]
-      ctx.fill()
-      
-      // Draw label line and text if slice is big enough
-      if (value / total > 0.05) {
-        const midAngle = startAngle + sliceAngle / 2
-        const labelRadius = radius * 0.7
-        const labelX = centerX + Math.cos(midAngle) * labelRadius
-        const labelY = centerY + Math.sin(midAngle) * labelRadius
-        
-        ctx.fillStyle = "#fff"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        ctx.font = "bold 14px Arial"
-        ctx.fillText(`${Math.round(value / total * 100)}%`, labelX, labelY)
-      }
-      
-      startAngle += sliceAngle
-    })
-    
-    // Draw legend
-    const legendY = canvas.height - 80
-    const itemsPerRow = 3
-    const itemWidth = canvas.width / itemsPerRow
-    const itemHeight = 25
-    
-    data.labels.forEach((label, index) => {
-      const row = Math.floor(index / itemsPerRow)
-      const col = index % itemsPerRow
-      
-      const x = col * itemWidth + 20
-      const y = legendY + row * itemHeight
-      
-      // Draw color box
-      ctx.fillStyle = data.colors[index]
-      ctx.fillRect(x, y, 15, 15)
-      
-      // Draw label
-      ctx.fillStyle = "#333"
-      ctx.textAlign = "left"
-      ctx.textBaseline = "middle"
-      ctx.font = "14px Arial"
-      ctx.fillText(label, x + 25, y + 7)
-    })
-    
-    // Draw title
-    ctx.textAlign = "center"
-    ctx.textBaseline = "top"
-    ctx.fillStyle = "#333"
-    ctx.font = "16px Arial"
-    ctx.fillText("Distribution des émotions", canvas.width / 2, 20)
-    
-  }, [period])
-
-  return (
-    <canvas 
-      ref={canvasRef} 
-      width={800} 
-      height={400}
-      className="w-full h-full"
-    />
-  )
+interface EmotionStat {
+  label: string
+  count: number
+  color: string
 }
 
+export function EmotionPieChart({ period, emotions }: EmotionPieChartProps) {
+  const emotionStats: EmotionStat[] = emotions.reduce((stats, emotion) => {
+    const existingStat = stats.find(stat => stat.label === emotion.emotion.label);
+    if (existingStat) {
+      existingStat.count++;
+    } else {
+      stats.push({
+        label: emotion.emotion.label,
+        count: 1,
+        color: emotion.emotion.color,
+      });
+    }
+    return stats;
+  }, [] as EmotionStat[]);
+  console.log(period)
+  return (
+    <Card className="flex flex-col">
+      <CardHeader className="items-center pb-0">
+        <CardTitle>Distribution des émotions</CardTitle>
+        <CardDescription>January - June 2024</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <PieChart>
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Pie
+              data={emotionStats}
+              dataKey="count"
+              nameKey="label"
+              innerRadius={60}
+            />
+          </PieChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing total visitors for the last 6 months
+        </div>
+      </CardFooter>
+    </Card>
+  )
+}

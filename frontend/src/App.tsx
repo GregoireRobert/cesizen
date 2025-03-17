@@ -13,11 +13,13 @@ import ReportsPage from './pages/reports'
 import InfoLayout from './layouts/info-layout'
 import AboutPage from './pages/info/about'
 import AdminLayout from './layouts/admin-layout'
-import AdminUsersPage from './pages/admin/users'
+import AdminUsersPage from './pages/admin/users/users'
 import AdminEmotionsPage from './pages/admin/emotions'
 import AdminContentPage from './pages/admin/content'
 import ProtectedRoute from './components/protected-route'
 import AdminRoute from './components/admin-route'
+import NewUserPage from "./pages/admin/users/new"
+import EditUserPage from "./pages/admin/users/edit"
 
 function App() {
   return (
@@ -61,6 +63,8 @@ function App() {
           }>
             <Route index element={<div>Tableau de bord admin</div>} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="users/new" element={<NewUserPage />} />
+            <Route path="users/edit/:id" element={<EditUserPage />} />
             <Route path="emotions" element={<AdminEmotionsPage />} />
             <Route path="content" element={<AdminContentPage />} />
             <Route path="reports" element={<div>Rapports admin</div>} />
