@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { useAuth } from '@/contexts/auth-context'
 interface Emotion {
   id: number
-  creationDate: string
+  date: string
   emotion: {
     label: string
     color: string

@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react"
 import { Pie, PieChart } from "recharts"
+import { startOfWeek, startOfMonth, startOfQuarter, startOfYear, isWithinInterval } from 'date-fns'
 
 import {
   Card,
@@ -18,73 +19,81 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
   other: {
     label: "Other",
-    color: "hsl(var(--chart-5))",
+    color: "#AAAAAA",
   },
 } satisfies ChartConfig
 
+
 interface Emotion {
   id: number
-  creationDate: string
+  date: string
   emotion: {
     label: string
     color: string
   }
   note: string
 }
+
 interface EmotionPieChartProps {
-  period: string
+  period: 'week' | 'month' | 'quarter' | 'year'
   emotions: Emotion[]
 }
 
 interface EmotionStat {
   label: string
   count: number
-  color: string
+  fill: string
+}
+
+function getStartDate(period: 'week' | 'month' | 'quarter' | 'year', date: Date): Date {
+  switch (period) {
+    case 'week':
+      return startOfWeek(date)
+    case 'month':
+      return startOfMonth(date)
+    case 'quarter':
+      return startOfQuarter(date)
+    case 'year':
+      return startOfYear(date)
+  }
 }
 
 export function EmotionPieChart({ period, emotions }: EmotionPieChartProps) {
-  const emotionStats: EmotionStat[] = emotions.reduce((stats, emotion) => {
-    const existingStat = stats.find(stat => stat.label === emotion.emotion.label);
-    if (existingStat) {
-      existingStat.count++;
-    } else {
-      stats.push({
-        label: emotion.emotion.label,
-        count: 1,
-        color: emotion.emotion.color,
-      });
-    }
-    return stats;
-  }, [] as EmotionStat[]);
-  console.log(period)
+  const now = new Date()
+  const startDate = getStartDate(period, now)
+
+  const emotionStats: EmotionStat[] = emotions
+    .filter(emotion => isWithinInterval(new Date(emotion.date), { start: startDate, end: now }))
+    .reduce((stats, emotion) => {
+      const existingStat = stats.find(stat => stat.label === emotion.emotion.label);
+      if (existingStat) {
+        existingStat.count++;
+      } else {
+        stats.push({
+          label: emotion.emotion.label,
+          count: 1,
+          fill: emotion.emotion.color,
+        });
+      }
+      return stats;
+    }, [] as EmotionStat[]);
+
+  const periodLabel = {
+    'week': 'Cette semaine',
+    'month': 'Ce mois',
+    'quarter': 'Ce trimestre',
+    'year': 'Cette année'
+  }[period]
+  console.log(emotions)
+  console.log(emotionStats)
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Distribution des émotions</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>{periodLabel}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -105,14 +114,6 @@ export function EmotionPieChart({ period, emotions }: EmotionPieChartProps) {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   )
 }

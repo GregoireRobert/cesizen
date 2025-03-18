@@ -62,10 +62,9 @@ export default function HomePage() {
               <div className="rounded-lg overflow-hidden">
                 <img
                   src="/logo_grand_cesizen.png"
-                  height="200"
-                  width="300"
+                  // width="300"
                   alt="Application de gestion du stress"
-                  className="aspect-video object-cover w-full"
+                  className="drop-shadow-xl"
                 />
               </div>
             </div>
