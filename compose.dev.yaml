@@ -1,0 +1,56 @@
+# compose.dev.yaml
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: "!ChangeMe!"
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "5432:5432"             # accès local (IDE/psql)
+
+  backend:
+    image: ghcr.io/gregoirerobert/cesizen-backend:${BACK_TAG:-latest}
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - ./backend/.env          # adapte si ton .env est ailleurs
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 1
+      SERVER_NAME: localhost
+      DATABASE_URL: "postgresql://app:!ChangeMe!@database:5432/app?serverVersion=16&charset=utf8"
+      # MERCURE_URL, MERCURE_PUBLIC_URL, JWT_PASSPHRASE ... (si nécessaires)
+    ports:
+      - "8080:80"               # API: http://localhost:8080 (→ /api)
+    # Option “hot reload” : décommente si le chemin correspond dans l’image
+    # volumes:
+    #   - ./backend:/srv/api
+
+  cesizen-web:
+    image: ghcr.io/gregoirerobert/cesizen-web:${BACK_TAG:-latest}
+    environment:
+      NODE_ENV: dev
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"             # Front: http://localhost:3000
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8888:80"               # PGAdmin: http://localhost:8888
+
+volumes:
+  database_data:
